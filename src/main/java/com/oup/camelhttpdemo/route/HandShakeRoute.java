@@ -22,17 +22,18 @@ public class HandShakeRoute extends RouteBuilder{
         .log(LoggingLevel.INFO,log,"HandshakeRouteCalled.................")
         .setHeader("Exchange.HTTP_METHOD").simple("GET")
 		.setHeader("Content-Type").simple("application/json")
-		.setHeader("Accept").simple("application/json")
-        .to("https://payments.cat.uk.pt-x.com/payments-service/api/security/handshake")
+		//.setHeader("Accept").simple("application/json")
+        .to("https://payments.cat.uk.pt-x.com/payments-service/api/security/handshake?cookieHandler=#springManagedexchangeCookieHandler")
         //.to("https://www.google.com/")
         .convertBodyTo(String.class)
-        .log(LoggingLevel.INFO, log, "${body}")
+        //.log(LoggingLevel.INFO, log, "${body}")
         .log(LoggingLevel.INFO, log, "${headers.X-CSRF}")
         .log(LoggingLevel.INFO, log, "${headers.Set-Cookie}")
+        .setProperty("csrftoken", simple("${headers.X-CSRF}"))
         .unmarshal().json(JsonLibrary.Jackson,HandshakeResponse.class)
-		.log(LoggingLevel.INFO, log,"Response Body ${body}")
-        .process("springManagedHandShakePostProcessor")
-        .to("log:com.oup.camelhttpdemo.route.HandShakeRoute");
+        .to("direct:autheticate");
+        //.process("springManagedHandShakePostProcessor")
+        //.to("log:com.oup.camelhttpdemo.route.HandShakeRoute");
         
     }
     
