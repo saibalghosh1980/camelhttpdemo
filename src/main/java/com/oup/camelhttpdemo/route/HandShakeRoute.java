@@ -18,13 +18,14 @@ public class HandShakeRoute extends RouteBuilder{
     @Override
     public void configure() throws Exception {
         from("direct:handShake").routeId("id_HandShakeRoute")
-        .streamCaching()
+        //.streamCaching()
         .log(LoggingLevel.INFO,log,"HandshakeRouteCalled.................")
         .setHeader("Exchange.HTTP_METHOD").simple("GET")
 		.setHeader("Content-Type").simple("application/json")
 		.setHeader("Accept").simple("application/json")
         .to("https://payments.cat.uk.pt-x.com/payments-service/api/security/handshake")
         //.to("https://www.google.com/")
+        .convertBodyTo(String.class)
         .log(LoggingLevel.INFO, log, "${body}")
         .log(LoggingLevel.INFO, log, "${headers.X-CSRF}")
         .log(LoggingLevel.INFO, log, "${headers.Set-Cookie}")
