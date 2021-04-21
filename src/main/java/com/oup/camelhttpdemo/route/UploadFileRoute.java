@@ -18,14 +18,30 @@ public class UploadFileRoute extends RouteBuilder{
         //.process("springManagedUploadFilePreProcessor")
         .setHeader("Exchange.HTTP_METHOD").simple("POST").setHeader("Content-Type").simple("application/json")
         .setHeader("X-CSRF").simple("${exchangeProperty.csrftoken}")
+        //.setHeader("Cookie").simple("${exchangeProperty.jsessionid}")
         .setHeader("com.bottomline.auth.token").simple("${exchangeProperty.authtoken}")
+        .log(LoggingLevel.INFO, log, "Cookie: ${headers.Cookie}")
         .setBody().simple("{\n  \"entity\": {\n    \"name\": \"Applications\",\n    \"symbol\": \"com.bottomline.cpay.model.applications\",\n    \"key\": \"com.bottomline.cpay.model.applications\"\n  },\n  \"resultFields\": [\n    {\n      \"name\": \"All Applications Minimal\",\n      \"symbol\": \"com.bottomline.cpay.model.AllApplicationsMinimal\",\n      \"fieldType\": \"OBJECT\",\n      \"key\": false\n    },\n    {\n      \"name\": \"rowCount\",\n      \"symbol\": \"com.bottomline.query.count\",\n      \"fieldType\": \"LONG\",\n      \"key\": false\n    }\n  ],\n  \"resultsPage\": {\n    \"firstResult\": 0,\n    \"maxResults\": 500\n  }\n}")
         .to("log:com.oup.camelhttpdemo.route.UploadFileRoute?showBody=true&showHeaders=true")
         //.to("https://payments.cat.uk.pt-x.com/payments-service/api/file/upload/28804?cookieHandler=#springManagedexchangeCookieHandler");
-        .to("https://payments.cat.uk.pt-x.com/payments-service/api/query/execute?cookieHandler=#springManagedexchangeCookieHandler&throwExceptionOnFailure=false")
+        .to("https://payments.cat.uk.pt-x.com/payments-service/api/query/execute?cookieHandler=#springManagedexchangeCookieHandler")
         .convertBodyTo(String.class)
-        .log("${body}")
-        .to("log:com.oup.camelhttpdemo.route.UploadFileRoute?showBody=true&showHeaders=true");
+        //.log("${body}")
+        //.to("log:com.oup.camelhttpdemo.route.UploadFileRoute?showBody=true&showHeaders=true")
+        
+
+        .process("springManagedUploadFilePreProcessor")
+        .setHeader("Exchange.HTTP_METHOD").simple("POST").setHeader("Content-Type").simple("multipart/form-data")
+        .setHeader("X-CSRF").simple("${exchangeProperty.csrftoken}")
+        //.setHeader("Cookie").simple("${exchangeProperty.jsessionid}")
+        .setHeader("com.bottomline.auth.token").simple("${exchangeProperty.authtoken}")
+        .to("https://payments.cat.uk.pt-x.com/payments-service/api/file/upload/28804?cookieHandler=#springManagedexchangeCookieHandler")
+        .to("log:com.oup.camelhttpdemo.route.UploadFileRoute?showBody=true&showHeaders=true")
+        .convertBodyTo(String.class)
+        .log(LoggingLevel.INFO, log, "response Code : ${header.CamelHttpResponseCode}")
+        .log(LoggingLevel.INFO, log, "${body}")
+
+        ;
 
 
         
